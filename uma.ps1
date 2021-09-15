@@ -20,9 +20,9 @@ public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int 
 #変数類
 $ProgressPreference = "SilentlyContinue"
 ( $init = {
-	Set-Location "C:/Users/so_syan6/Umamusume"
+	Set-Location "$home/Umamusume"
 	Add-Type -AssemblyName System.Windows.Forms
-	
+
 	$script:n = [System.Environment]::NewLine;
 	$script:verUri = "https://api.github.com/repos/amate/UmaUmaCruise/releases?per_page=1&page=1"
 	$script:libUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/UmaLibrary/UmaMusumeLibrary_v2.json"
@@ -78,7 +78,7 @@ if( $version.name -eq $Matches[0] ){
 		Start-Job -InitializationScript $init -ScriptBlock {
 			Rename-Item -Path $umaLibPath -NewName "UmaMusumeLibrary_prev.json" -Force
 			Invoke-WebRequest -Uri $libUri -OutFile $umaLibPath
-			
+
 			[System.Windows.Forms.MessageBox]::Show(
 				"UmaMusumeLibraryを更新しました",
 				"更新完了",
@@ -152,7 +152,7 @@ if( $DLUUC ){
 		Move-Item -Path "./uuc.tmp/UmaUmaCruise" -Destination "./"
 		Copy-Item -Path "./UmaUmaCruise.old/screenshot" -Destination "./UmaUmaCruise/" -Recurse -Force
 		Copy-Item -Path "./UmaUmaCruise.old/*.json" -Destination "./UmaUmaCruise/" -Force
-		
+
 		[System.Windows.Forms.MessageBox]::Show( "UmaUmaCruiseの更新が完了しました" )
 	}
 	Remove-Item "uuc.tmp*" -Force
