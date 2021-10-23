@@ -33,11 +33,11 @@ $ProgressPreference = "SilentlyContinue"
 $wait = 100
 
 # ランチャーの更新確認
-if( ( Get-Item -Path "./UmamusumeLauncher.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $launcherUri ).Headers["Content-Length"] ){
+if( ( Get-Item -Path "./UmamusumeLauncher.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri ).Headers["Content-Length"] ){
 	Write-Host -ForegroundColor Cyan "ランチャーは最新バージョンです"
 }else{
 	Write-Host -ForegroundColor Red "ランチャーの更新があります"
-	Invoke-WebRequest -Uri $launcherUri -OutFile "./UmamusumeLauncher.ps1"
+	Invoke-WebRequest -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri -OutFile "./UmamusumeLauncher.ps1"
 	exit
 }
 
