@@ -24,7 +24,7 @@ $ProgressPreference = "SilentlyContinue"
 	Add-Type -AssemblyName System.Windows.Forms
 
 	$script:n = [System.Environment]::NewLine;
-	$script:launcherUri = "https://raw.githubusercontent.com/sosyan6/Uma/main/uma.ps1"
+	$script:launcherUri = "https://raw.githubusercontent.com/sosyan6/Uma/main/UmamusumeLauncher.ps1"
 	$script:UUCVerUri = "https://api.github.com/repos/amate/UmaUmaCruise/releases?per_page=1&page=1"
 	$script:UUCLogUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/readme.md"
 	$script:UUCLibUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/UmaLibrary/UmaMusumeLibrary_v2.json"
@@ -33,11 +33,11 @@ $ProgressPreference = "SilentlyContinue"
 $wait = 100
 
 # ランチャーの更新確認
-if( ( Get-Item -Path "./uma.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $launcherUri ).Headers["Content-Length"] ){
+if( ( Get-Item -Path "./UmamusumeLauncher.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $launcherUri ).Headers["Content-Length"] ){
 	Write-Host -ForegroundColor Cyan "ランチャーは最新バージョンです"
 }else{
 	Write-Host -ForegroundColor Red "ランチャーの更新があります"
-	Invoke-WebRequest -Uri $launcherUri -OutFile "./uma.ps1"
+	Invoke-WebRequest -Uri $launcherUri -OutFile "./UmamusumeLauncher.ps1"
 	exit
 }
 
@@ -75,7 +75,6 @@ if( ![System.Diagnostics.Process]::GetProcessesByName( "UmaUmaCruise" ) ){
 }else{
 	Write-Host -ForegroundColor Yellow "UmaUmaCruiseは既に開かれています"
 }
-
 
 # UmaUmaCruiseの更新確認
 Write-Host "UmaUmaCruiseの更新を確認しています..."
