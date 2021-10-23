@@ -17,19 +17,29 @@ public static extern bool GetWindowRect( IntPtr hwnd, out RECT lp );
 public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
 '@ -NameSpace $null -Name win32
 
-#変数類
+# 変数
 $ProgressPreference = "SilentlyContinue"
 ( $init = {
 	Set-Location "$home/Umamusume"
 	Add-Type -AssemblyName System.Windows.Forms
 
 	$script:n = [System.Environment]::NewLine;
-	$script:verUri = "https://api.github.com/repos/amate/UmaUmaCruise/releases?per_page=1&page=1"
-	$script:libUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/UmaLibrary/UmaMusumeLibrary_v2.json"
-	$script:umaLibPath = "./UmaUmaCruise/UmaLibrary/UmaMusumeLibrary.json"
+	$script:launcherUri = "https://raw.githubusercontent.com/sosyan6/Uma/main/uma.ps1"
+	$script:UUCVerUri = "https://api.github.com/repos/amate/UmaUmaCruise/releases?per_page=1&page=1"
+	$script:UUCLogUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/readme.md"
+	$script:UUCLibUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/UmaLibrary/UmaMusumeLibrary_v2.json"
+	$script:UUCLibPath = "./UmaUmaCruise/UmaLibrary/UmaMusumeLibrary.json"
 } ).Invoke()
 $wait = 100
 
+# ランチャーの更新確認
+if( ( Get-Item -Path "./uma.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $launcherUri ).Headers["Content-Length"] ){
+	Write-Host -ForegroundColor Cyan "ランチャーの更新は必要ありません"
+}else{
+	Write-Host -ForegroundColor Red "ランチャーの更新があります"
+}
+
+# bounds.jsonの生成
 if( !( Test-Path -Path "./bounds.json" ) ){
 	Set-Content -Path "./bounds.json" -Encoding UTF8 -Value @'
 {
@@ -64,20 +74,21 @@ if( ![System.Diagnostics.Process]::GetProcessesByName( "UmaUmaCruise" ) ){
 	Write-Host -ForegroundColor Yellow "UmaUmaCruiseは既に開かれています"
 }
 
-Write-Host "UmaUmaCruiseの更新を確認しています..."
 
-$version = ( Invoke-WebRequest -Uri $verUri ).Content | ConvertFrom-Json
-( Get-Content -Encoding UTF8 -Raw -Path "./UmaUmaCruise/readme.md" ) -match "v\d+\.\d+" | Out-Null
+# UmaUmaCruiseの更新確認
+Write-Host "UmaUmaCruiseの更新を確認しています..."
+$version = ( Invoke-WebRequest -Uri $UUCVerUri ).Content | ConvertFrom-Json
+( Get-Content -Encoding UTF8 -Raw -Path "./UmaUmaCruise/readme.md" ) -match "v\d+\.\d+\.?\d*" | Out-Null
 if( $version.name -eq $Matches[0] ){
 	Write-Host -ForegroundColor Cyan "現在のUmaUmaCriseは最新バージョンです"
 	Write-Host "UmaMusumeLibraryの更新を確認しています..."
-	if( ( Get-Item -Path $umaLibPath ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $libUri ).Headers["Content-Length"] ){
+	if( ( Get-Item -Path $UUCLibPath ).Length -eq ( Invoke-WebRequest -Method HEAD -Uri $UUCLibUri ).Headers["Content-Length"] ){
 		Write-Host -ForegroundColor Cyan "UmaMusumeLibraryの更新はありません"
 	}else{
 		Write-Host -ForegroundColor Red "UmaMusumeLibraryの更新があります"
 		Start-Job -InitializationScript $init -ScriptBlock {
-			Rename-Item -Path $umaLibPath -NewName "UmaMusumeLibrary_prev.json" -Force
-			Invoke-WebRequest -Uri $libUri -OutFile $umaLibPath
+			Rename-Item -Path $UUCLibPath -NewName "UmaMusumeLibrary_prev.json" -Force
+			Invoke-WebRequest -Uri $UUCLibUri -OutFile $UUCLibPath
 
 			[System.Windows.Forms.MessageBox]::Show(
 				"UmaMusumeLibraryを更新しました",
@@ -89,6 +100,8 @@ if( $version.name -eq $Matches[0] ){
 	}
 }else{
 	Write-Host -ForegroundColor Red "UmaUmaCruiseの最新バージョンがあります($( $Matches[0] ) -> $( $version.name ))"
+	( Invoke-WebRequest -Uri $UUCLogUri ).Content -match "(?<=v\d+\.\d+\.?\d*.*\n)(.|\n)*?(?=\nv\d+\.\d+\.?\d*)" | Out-Null
+	Write-Host -ForegroundColor Red $Matches[0]
 	$script:DLUUC = Start-Job -InitializationScript $init -ArgumentList $version -ScriptBlock {
 		param( $version )
 
@@ -147,7 +160,7 @@ if( $DLUUC ){
 		[System.Windows.Forms.MessageBoxButtons]::YesNo,
 		[System.Windows.Forms.MessageBoxIcon]::Question
 	) -and ( $DLUUC | Wait-Job ) ){
-		Remove-Item "./UmaUmaCruise.old" -Force
+		Remove-Item "./UmaUmaCruise.old" -Recurse -Force
 		Rename-Item -Path "./UmaUmaCruise" -NewName "./UmaUmaCruise.old" -Force
 		Move-Item -Path "./uuc.tmp/UmaUmaCruise" -Destination "./"
 		Copy-Item -Path "./UmaUmaCruise.old/screenshot" -Destination "./UmaUmaCruise/" -Recurse -Force
