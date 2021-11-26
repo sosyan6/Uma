@@ -1,8 +1,4 @@
 # ‰Šú‰»
-# ˆø”
-Param(
-	[String]$UmaDir = "$home/Umamusume"
-)
 # Win32ApiéŒ¾
 Add-Type -MemberDefinition @'
 public struct RECT
@@ -24,7 +20,7 @@ public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int 
 # •Ï”
 $ProgressPreference = "SilentlyContinue"
 ( $init = {
-	Set-Location $UmaDir
+	Set-Location "$home/Umamusume"
 	Add-Type -AssemblyName System.Windows.Forms
 
 	$script:n = [System.Environment]::NewLine;
