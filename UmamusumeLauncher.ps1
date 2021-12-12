@@ -29,6 +29,18 @@ $ProgressPreference = "SilentlyContinue"
 	$script:UUCLogUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/readme.md"
 	$script:UUCLibUri = "https://raw.githubusercontent.com/amate/UmaUmaCruise/master/UmaLibrary/UmaMusumeLibrary_v2.json"
 	$script:UUCLibPath = "./UmaUmaCruise/UmaLibrary/UmaMusumeLibrary.json"
+
+	function Show-Toast
+	{
+		param{
+			$message
+		}
+		$template = [Windows.UI.Notifications.ToastNotificationManager,Windows.UI.Notifications, ContentType = WindowsRuntime]::GetTemplateContent(
+			[Windows.UI.Notifications.ToastTemplateType, Windows.UI.Notifications, ContentType = WindowsRuntime]::ToastText01
+		);
+		$template.GetElementsByTagName( "text" )[0].InnerText = $message;
+		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier( "dmmgameplayer://umamusume/cl/general/umamusume" ).Show( $template );
+	}
 } ).Invoke()
 $wait = 100
 
