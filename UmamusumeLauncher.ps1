@@ -47,14 +47,14 @@ $ProgressPreference = "SilentlyContinue"
 } ).Invoke()
 $wait = 100
 
-# ランチャーの更新確認
-# if( ( Get-Item -Path "./UmamusumeLauncher.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri ).Headers["Content-Length"] ){
-# 	Write-Host -ForegroundColor Cyan "ランチャーは最新バージョンです"
-# }else{
-# 	Write-Host -ForegroundColor Red "ランチャーの更新があります"
-# 	Invoke-WebRequest -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri -OutFile "./UmamusumeLauncher.ps1"
-# 	exit
-# }
+ランチャーの更新確認
+if( ( Get-Item -Path "./UmamusumeLauncher.ps1" ).Length -eq ( Invoke-WebRequest -Method HEAD -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri ).Headers["Content-Length"] ){
+	Write-Host -ForegroundColor Cyan "ランチャーは最新バージョンです"
+}else{
+	Write-Host -ForegroundColor Red "ランチャーの更新があります"
+	Invoke-WebRequest -Headers @{ "Cache-Control" = "no-cache" } -Uri $launcherUri -OutFile "./UmamusumeLauncher.ps1"
+	exit
+}
 
 # bounds.jsonの生成
 if( !( Test-Path -Path "./bounds.json" ) ){
