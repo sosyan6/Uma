@@ -15,6 +15,9 @@ public static extern bool GetWindowRect( IntPtr hwnd, out RECT lp );
 [DllImport("user32.dll", SetLastError = true)]
 [return: MarshalAs(UnmanagedType.Bool)]
 public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+[DllImport("user32.dll")]
+public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 '@ -NameSpace $null -Name win32
 
 # 変数
@@ -134,6 +137,7 @@ $ps = [System.Diagnostics.Process]::GetProcessesByName( "umamusume" )
 $rect = New-Object -TypeName "win32+RECT"
 
 Write-Host "ウマ娘のウィンドウサイズを固定します..."
+[Win32]::ShowWindowAsync( ( Get-Process -PID $PID ).MainWindowHandle, 2 )
 While( [System.Diagnostics.Process]::GetProcessesByName( "umamusume" ).MainWindowHandle )
 {
 	Start-Sleep -m $wait
